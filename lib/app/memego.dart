@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import '../screens/home/home.dart';
+import '../modules/Communication.dart';
 
 
 class MemeGo extends StatelessWidget {
-  const MemeGo({super.key});
+  final Communication com;
+  const MemeGo({super.key, required this.com});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       initialRoute: "/home",
       routes:{
-         "/home": (context) => const HomePage()
+         "/home": (context) => HomePage(com: com)
         },
         
     );

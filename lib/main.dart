@@ -1,17 +1,15 @@
-//import 'package:flutter/material.dart';
-//import 'app/memego.dart';
+import 'package:flutter/material.dart';
+import 'app/memego.dart';
 
 import 'dart:io';
 import 'modules/keySwap.dart';
+import 'modules/Communication.dart';
 
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  final s = await Socket.connect("127.0.0.1", 4133);
 
-void main() {
-  Socket.connect("127.0.0.1", 4133).then((s){
-      Keyswap.swap(s).then((s){
-        print(s.key);
-      });
-  });
+  final Communication com = await Keyswap.swap(s);
 
-
-  //runApp(const MemeGo());
+  runApp(MemeGo(com: com));
 }
