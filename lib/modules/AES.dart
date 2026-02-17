@@ -3,66 +3,43 @@ import 'dart:math';
 import 'package:pointycastle/export.dart';
 
 class AES {
-  /// PKCS7 padding (block size = 16 bytes)
-  static Uint8List _pad(Uint8List data) {
-    const blockSize = 16;
-    final padLen = blockSize - (data.length % blockSize);
-    return Uint8List.fromList(data + List.filled(padLen, padLen));
-  }
+  static Uint8List aesGcmEncrypt(Uint8List plaintext, Uint8List key) {
+    final nonce = secureRandomBytes(12);
 
-  static Uint8List _unpad(Uint8List data) {
-    final padLen = data.last;
-    return data.sublist(0, data.length - padLen);
-  }
-
-  /// AES-CBC Encrypt (returns IV + ciphertext)
-  static Uint8List aesCbcEncrypt(Uint8List plaintext, Uint8List key) {
-    final iv = secureRandomBytes(16);
-
-    final cipher = CBCBlockCipher(AESEngine())
+    final cipher = GCMBlockCipher(AESEngine())
       ..init(
         true,
-        ParametersWithIV(KeyParameter(key), iv),
+        AEADParameters(KeyParameter(key), 128, nonce, Uint8List(0)),
       );
 
-    final padded = _pad(plaintext);
-    final output = Uint8List(padded.length);
+    final output = Uint8List(cipher.getOutputSize(plaintext.length));
+    final len = cipher.processBytes(plaintext, 0, plaintext.length, output, 0);
+    final finalLen = len + cipher.doFinal(output, len);
 
-    for (int i = 0; i < padded.length; i += 16) {
-      cipher.processBlock(padded, i, output, i);
-    }
+    final ciphertextWithTag = output.sublist(0, finalLen);
 
-    // IV || ciphertext
-    return Uint8List.fromList(iv + output);
+    return Uint8List.fromList(nonce + ciphertextWithTag);
   }
 
-  /// AES-CBC Decrypt (expects IV + ciphertext)
-  static Uint8List aesCbcDecrypt(Uint8List ciphertext, Uint8List key) {
-    final iv = ciphertext.sublist(0, 16);
-    final encrypted = ciphertext.sublist(16);
+  static Uint8List aesGcmDecrypt(Uint8List data, Uint8List key) {
+    final nonce = data.sublist(0, 12);
+    final ciphertextWithTag = data.sublist(12);
 
-    final cipher = CBCBlockCipher(AESEngine())
+    final cipher = GCMBlockCipher(AESEngine())
       ..init(
         false,
-        ParametersWithIV(KeyParameter(key), iv),
+        AEADParameters(KeyParameter(key), 128, nonce, Uint8List(0)),
       );
 
-    final output = Uint8List(encrypted.length);
+    final output = Uint8List(cipher.getOutputSize(ciphertextWithTag.length));
+    final len = cipher.processBytes(ciphertextWithTag, 0, ciphertextWithTag.length, output, 0);
+    cipher.doFinal(output, len);
 
-    for (int i = 0; i < encrypted.length; i += 16) {
-      cipher.processBlock(encrypted, i, output, i);
-    }
-
-    return _unpad(output);
+    return output;
   }
 
-  /// Cryptographically secure random bytes
   static Uint8List secureRandomBytes(int length) {
     final rnd = Random.secure();
-    final bytes = Uint8List(length);
-    for (int i = 0; i < length; i++) {
-      bytes[i] = rnd.nextInt(256);
-    }
-    return bytes;
+    return Uint8List.fromList(List.generate(length, (_) => rnd.nextInt(256)));
   }
 }

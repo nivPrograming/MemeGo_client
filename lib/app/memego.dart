@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../screens/home/home.dart';
+import '../screens/login/login.dart';
+
 import '../modules/Communication.dart';
 
 
@@ -10,9 +12,11 @@ class MemeGo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      initialRoute: "/home",
+      initialRoute: "/login",
       routes:{
-         "/home": (context) => HomePage(com: com)
+         "/home": (context) => HomePage(com: com),
+         "/login": (context) => LoginPage(com: com)
+
         },
         
     );

@@ -28,7 +28,7 @@ class Communication {
   /// Send Message
   void send(Message msg) {
     final plain = msg.prepare();
-    final encrypted = AES.aesCbcEncrypt(plain, key);
+    final encrypted = AES.aesGcmEncrypt(plain, key);
 
     sendWithSize(encrypted);
   }
@@ -38,7 +38,7 @@ class Communication {
     final encrypted = await recvBySize();
     if (encrypted.isEmpty) return null;
 
-    final decrypted = AES.aesCbcDecrypt(encrypted, key);
+    final decrypted = AES.aesGcmDecrypt(encrypted, key);
     return Message.loadFromBytes(decrypted);
   }
 
