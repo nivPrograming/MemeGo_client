@@ -1,15 +1,15 @@
-import 'package:client/models/Message.dart';
+import 'package:flutter/material.dart';
 import 'dart:typed_data';
 import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'login.dart';
-import '../../modules/jwt_storage.dart';
+
+import 'signup.dart';
+import '../../modules/Communication.dart';
+import '../../models/Message.dart';
 
 
-
-class LoginState extends State<LoginPage>{
-
+class SignupPageState extends State<SignupPage> {
   final _formKey = GlobalKey<FormState>();
+  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -18,49 +18,57 @@ class LoginState extends State<LoginPage>{
 
   @override
   void dispose() {
+    _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
-  Future<void> _handleLogin() async {
+  Future<void> _handleSignup() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
 
     String email = _emailController.text.trim();
     String password = _passwordController.text;
+    String username = _usernameController.text;
 
     Uint8List bytesEmail = Uint8List.fromList(utf8.encode(email));
     Uint8List bytesPsw = Uint8List.fromList(utf8.encode(password));
+    Uint8List bytesUsername = Uint8List.fromList(utf8.encode(username));
 
-    Message msg = Message(0x0001, 0x0000, [bytesEmail, bytesPsw]);
+    Message msg = Message(0x0002, 0x0000, [bytesEmail, bytesPsw, bytesUsername]);
     widget.com.send(msg);
 
     Message? reply = await widget.com.recv();
 
 
-    bool loginSuccess = false;
+    bool signupSuccess = false;
 
-    if (reply != null && reply.status == 0x0001 && reply.opcode == 0x0001){
-      loginSuccess = true;
-      await JwtStorage().write(String.fromCharCodes(reply.fields[0]));
+    if (reply != null && reply.status == 0x0001 && reply.opcode == 0x0002){
+      signupSuccess = true;
 
     }
 
     setState(() => _isLoading = false);
 
-    if (mounted && loginSuccess) {
+    if (mounted && signupSuccess) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Logged in successfully!')),
+        const SnackBar(content: Text('Account created successfully!')),
       );
-      
-      Navigator.popAndPushNamed(context, "/verify_token");      
+
+      Navigator.popAndPushNamed(context, '/login');
+    }
+
+    else if (mounted && reply != null && reply.status == 0x0003 && reply.opcode == 0x0002) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Email already used!')),
+      );
     }
 
     else if (mounted){
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('psw or username are incorrect!')),
+        const SnackBar(content: Text('something whent wrong!')),
       );
     }
   }
@@ -68,7 +76,7 @@ class LoginState extends State<LoginPage>{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
+      appBar: AppBar(title: const Text('Sign Up')),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Form(
@@ -76,6 +84,25 @@ class LoginState extends State<LoginPage>{
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // Username field
+              TextFormField(
+                controller: _usernameController,
+                decoration: const InputDecoration(
+                  labelText: 'Username',
+                  border: OutlineInputBorder(),
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Please enter a username';
+                  }
+                  if (value.trim().length < 3) {
+                    return 'Username must be at least 3 characters';
+                  }
+                  return null;
+                },
+              ),
+              const SizedBox(height: 16),
+
               // Email field
               TextFormField(
                 controller: _emailController,
@@ -126,27 +153,27 @@ class LoginState extends State<LoginPage>{
               ),
               const SizedBox(height: 24),
 
-              // Login button
+              // Sign up button
               SizedBox(
                 width: double.infinity,
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: _isLoading ? null : _handleLogin,
+                  onPressed: _isLoading ? null : _handleSignup,
                   child: _isLoading
                       ? const CircularProgressIndicator()
-                      : const Text('Login'),
+                      : const Text('Sign Up'),
                 ),
               ),
 
-               // Move to Signup button
+                // Move to login button
               SizedBox(
                 width: double.infinity,
                 height: 24,
                 child: ElevatedButton(
-                  onPressed: _isLoading ? null : () => Navigator.popAndPushNamed(context, "/signup"),
+                  onPressed: _isLoading ? null : () => Navigator.popAndPushNamed(context, "/login"),
                   child: _isLoading
                       ? const CircularProgressIndicator()
-                      : const Text("Dont have an acount"),
+                      : const Text("Already have an acount?"),
                 ),
               ),
             ],
@@ -155,5 +182,4 @@ class LoginState extends State<LoginPage>{
       ),
     );
   }
-
 }

@@ -33,9 +33,8 @@ class AES {
 
     final output = Uint8List(cipher.getOutputSize(ciphertextWithTag.length));
     final len = cipher.processBytes(ciphertextWithTag, 0, ciphertextWithTag.length, output, 0);
-    cipher.doFinal(output, len);
-
-    return output;
+    final finalLen = len + cipher.doFinal(output, len);
+    return output.sublist(0, finalLen);
   }
 
   static Uint8List secureRandomBytes(int length) {

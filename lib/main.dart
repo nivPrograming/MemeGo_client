@@ -10,7 +10,6 @@ void main() async{
   final s = await Socket.connect("10.0.2.2", 4133);
 
   final Communication com = await Keyswap.swap(s);
-  print(com.key);
 
   runApp(MemeGo(com: com));
 }
