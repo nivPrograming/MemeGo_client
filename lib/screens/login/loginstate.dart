@@ -42,10 +42,9 @@ class LoginState extends State<LoginPage>{
 
     bool loginSuccess = false;
 
-    if (reply != null && reply.status == 0x0001 && reply.opcode == 0x0001){
+    if (reply != null && reply.status == 0x0001 && reply.opcode == 0x0001 && reply.fields.isNotEmpty){
       loginSuccess = true;
       await JwtStorage().write(String.fromCharCodes(reply.fields[0]));
-
     }
 
     setState(() => _isLoading = false);
@@ -67,6 +66,9 @@ class LoginState extends State<LoginPage>{
 
   @override
   Widget build(BuildContext context) {
+    
+    JwtStorage().read().then((s) => print(s));
+
     return Scaffold(
       appBar: AppBar(title: const Text('Login')),
       body: Padding(

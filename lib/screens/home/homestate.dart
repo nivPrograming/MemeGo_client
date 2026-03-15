@@ -11,6 +11,7 @@ import '../../models/Message.dart';
 import '../../models/data_base_types.dart';
 
 import "../../modules/json_helper.dart";
+import "../../modules/jwt_storage.dart";
 
 
 class HomeState extends State<HomePage>{
@@ -44,8 +45,13 @@ class HomeState extends State<HomePage>{
         if (creatureType != null && creatureType.containsKey('photo')){
           newCretures.add(Marker(point: LatLng(creature.lat,creature.lon),
                                 width: 60.0,
-                                height: 60.0,
-                                child: Image.asset("Creatures/${creatureType['photo']}")));
+                                height: 60.0, 
+                                child: GestureDetector(
+                                  onTap: () => Navigator.pushNamed(context, '/catch', arguments: creature),
+                                  child: Image.asset("Creatures/${creatureType['photo']}"),
+                                )
+                                )
+                          );
         }
       }
       newCretures.add(Marker(point: LatLng(lat,lon),
@@ -68,7 +74,7 @@ class HomeState extends State<HomePage>{
   void initState() {
     super.initState();
   
-    // Fetch data every 30 seconds
+    // Fetch data every 20 seconds
     _dataFetchTimer = Timer.periodic(Duration(seconds: 20), (timer) {
       _updateCreatures();
     });
@@ -76,13 +82,11 @@ class HomeState extends State<HomePage>{
 
   @override
   Widget build(BuildContext context){
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(backgroundColor: Colors.deepOrange, title: Text("meme mapping"),),
+    return Scaffold(
+        appBar: AppBar(backgroundColor: Colors.white, title: Text("meme mapping"),),
         body: FlutterMap(options: MapOptions(
             initialCenter: LatLng(lat, lon), // Tel Aviv
-            initialZoom: 13 ),
+            initialZoom: 16 ),
             children: [
             TileLayer(
               urlTemplate: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -92,15 +96,47 @@ class HomeState extends State<HomePage>{
               markers
             ),
           ],
-        )
-      )
-    );
+        ),
+        bottomNavigationBar: BottomNavigationBar(items: [
+            BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Settings"),
+            BottomNavigationBarItem(icon: Icon(Icons.archive_sharp), label: "Storage"),
+            BottomNavigationBarItem(icon: Icon(Icons.exit_to_app_sharp), label: "log out")
+          ],
+          onTap: handleNavBar
+          ,
+        ),
+      );
   }
 
 @override
   void dispose() {
     _dataFetchTimer?.cancel();
     super.dispose();
+  }
+
+
+  void handleNavBar(int index){
+      switch (index){
+        case 0:
+          break;
+        case 1:
+          break;
+        case 2:
+          logout();
+          break;
+      }
+  }
+
+  void logout() async{
+    Message msg = Message(0x000A, 0x0000);
+    widget.com.send(msg);
+
+    Message? reply = await widget.com.recv();
+    JwtStorage().delete();
+    if (mounted){
+      Navigator.popAndPushNamed(context, "/login");
+    }
+    
   }
   
 }

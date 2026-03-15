@@ -54,10 +54,10 @@ class SignupPageState extends State<SignupPage> {
 
     if (mounted && signupSuccess) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Account created successfully!')),
+        const SnackBar(content: Text('Account created successfully!  Authenticate your acount')),
       );
 
-      Navigator.popAndPushNamed(context, '/login');
+      Navigator.popAndPushNamed(context, '/auth');
     }
 
     else if (mounted && reply != null && reply.status == 0x0003 && reply.opcode == 0x0002) {
