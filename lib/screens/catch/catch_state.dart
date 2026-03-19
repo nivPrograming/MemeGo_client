@@ -95,16 +95,31 @@ class CatchPageState extends State<CatchPage> {
   }
 
 
-  void _handleCatch(){
+  void _handleCatch() async{
     if ((_creatureX - 0.5).abs() < 0.05 && (_creatureX - 0.5).abs() < 0.05){
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Caught successfully!')),
-        );
-        Navigator.pop(context);
+
+        Message msg = Message(0x0008, 0x0000, [widget.creature.toBytes()]);
+        widget.com.send(msg);
+        Message? reply =  await widget.com.recv();
+
+        if (mounted && reply != null && reply.opcode == 0x0008 && reply.status == 0x0001){
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Caught successfully!'))
+          );
+
+          Navigator.pop(context);
+        }
+        else if (mounted){
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('OPSSSS, No Catch for you today'))
+          );
+
+          Navigator.pop(context);
+        }
+
       }
     }
-  }
+
 
   void _updateCreature(){
     setState(() {

@@ -6,6 +6,7 @@ import '../Screens/verify_token/verify_token.dart';
 import '../Screens/singup/signup.dart';
 import '../Screens/auth/auth.dart';
 import '../screens/catch/catch.dart';
+import '../screens/storage/storage.dart';
 
 import '../modules/Communication.dart';
 
@@ -19,8 +20,6 @@ class MemeGo extends StatelessWidget {
     return MaterialApp(
       initialRoute: "/verify_token",
       onGenerateRoute: (RouteSettings settings) {
-      // settings.name is the route name (e.g., "/home")
-      // settings.arguments is any extra data you pass in pushNamed
         switch (settings.name) {
           case "/home":
             return MaterialPageRoute(builder: (context) => HomePage(com: com));
@@ -32,17 +31,18 @@ class MemeGo extends StatelessWidget {
             return MaterialPageRoute(builder: (context) => SignupPage(com: com));
           case "/auth":
             return MaterialPageRoute(builder: (context) => AuthPage(com: com));
+          case "/storage":
+            return MaterialPageRoute(builder: (context) => StoragePage(com: com));
 
             
-          // Example: Passing EXTRA data to a specific screen
+          
           case "/catch":
-            final extraData = settings.arguments as CreaturesInTheWild; // Extract data
+            final extraData = settings.arguments as CreaturesInTheWild;
             return MaterialPageRoute(
               builder: (context) => CatchPage(com: com, creature: extraData),
             );
 
           default:
-            // Fallback if route is not found
             return MaterialPageRoute(builder: (context) => SignupPage(com: com));
         }
       },

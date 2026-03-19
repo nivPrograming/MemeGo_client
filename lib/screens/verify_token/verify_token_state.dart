@@ -42,12 +42,15 @@ class VerifyTokenState extends State<VerifyToken> {
       if (reply.status == 0x0001 && mounted){
         Navigator.popAndPushNamed(context, '/home');
       }
-    }
 
-
-    else if (mounted){
+      else if (mounted){
       Navigator.popAndPushNamed(context, '/login');
+      print("logiinnin");
     }
+    }
+
+
+    
     
   }
 }

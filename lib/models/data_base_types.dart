@@ -119,13 +119,13 @@ class CreaturesCaught {
   final int id;
   final int type;
   final int resiliencePoints;
-  final int userId;
+  final String userEmail;
 
   CreaturesCaught({
     required this.id,
     required this.type,
     required this.resiliencePoints,
-    required this.userId,
+    required this.userEmail,
   });
 
   Uint8List toBytes() {
@@ -133,7 +133,7 @@ class CreaturesCaught {
       'id': id,
       'type': type,
       'resilience_points': resiliencePoints,
-      'user_id': userId,
+      'user_email': userEmail,
     };
     return Uint8List.fromList(utf8.encode(jsonEncode(data)));
   }
@@ -144,7 +144,7 @@ class CreaturesCaught {
       id: json['id'],
       type: json['type'],
       resiliencePoints: json['resilience_points'],
-      userId: json['user_id'],
+      userEmail: json['user_email'],
     );
   }
 }

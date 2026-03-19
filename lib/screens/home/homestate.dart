@@ -120,6 +120,7 @@ class HomeState extends State<HomePage>{
         case 0:
           break;
         case 1:
+          Navigator.pushNamed(context, "/storage");
           break;
         case 2:
           logout();
