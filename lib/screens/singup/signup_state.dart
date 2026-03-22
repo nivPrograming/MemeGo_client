@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'dart:typed_data';
 import 'dart:convert';
+import 'package:provider/provider.dart';
 
 import 'signup.dart';
 import '../../modules/Communication.dart';
 import '../../models/Message.dart';
+import '../../widgets/appState.dart';
 
 
 class SignupPageState extends State<SignupPage> {
@@ -38,9 +40,9 @@ class SignupPageState extends State<SignupPage> {
     Uint8List bytesUsername = Uint8List.fromList(utf8.encode(username));
 
     Message msg = Message(0x0002, 0x0000, [bytesEmail, bytesPsw, bytesUsername]);
-    widget.com.send(msg);
+    context.read<AppState>().com.send(msg);
 
-    Message? reply = await widget.com.recv();
+    Message? reply = await context.read<AppState>().com.recv();
 
 
     bool signupSuccess = false;
@@ -48,6 +50,10 @@ class SignupPageState extends State<SignupPage> {
     if (reply != null && reply.status == 0x0001 && reply.opcode == 0x0002){
       signupSuccess = true;
 
+    }
+
+    else if (reply == null && mounted){
+      Navigator.popAndPushNamed(context, '/reconnect');
     }
 
     setState(() => _isLoading = false);
@@ -68,7 +74,7 @@ class SignupPageState extends State<SignupPage> {
 
     else if (mounted){
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('something whent wrong!')),
+        const SnackBar(content: Text('something went wrong!')),
       );
     }
   }

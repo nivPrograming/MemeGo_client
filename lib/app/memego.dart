@@ -7,13 +7,12 @@ import '../Screens/singup/signup.dart';
 import '../Screens/auth/auth.dart';
 import '../screens/catch/catch.dart';
 import '../screens/storage/storage.dart';
+import '../screens/reconnect/reconnect.dart';
 
-import '../modules/Communication.dart';
 
 
 class MemeGo extends StatelessWidget {
-  final Communication com;
-  const MemeGo({super.key, required this.com});
+  const MemeGo({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,28 +21,30 @@ class MemeGo extends StatelessWidget {
       onGenerateRoute: (RouteSettings settings) {
         switch (settings.name) {
           case "/home":
-            return MaterialPageRoute(builder: (context) => HomePage(com: com));
+            return MaterialPageRoute(builder: (context) => HomePage());
           case "/login":
-            return MaterialPageRoute(builder: (context) => LoginPage(com: com));
+            return MaterialPageRoute(builder: (context) => LoginPage());
           case "/verify_token":
-            return MaterialPageRoute(builder: (context) => VerifyToken(com: com));
+            return MaterialPageRoute(builder: (context) => VerifyToken());
           case "/signup":
-            return MaterialPageRoute(builder: (context) => SignupPage(com: com));
+            return MaterialPageRoute(builder: (context) => SignupPage());
           case "/auth":
-            return MaterialPageRoute(builder: (context) => AuthPage(com: com));
+            return MaterialPageRoute(builder: (context) => AuthPage());
           case "/storage":
-            return MaterialPageRoute(builder: (context) => StoragePage(com: com));
+            return MaterialPageRoute(builder: (context) => StoragePage());
+          case "/reconnect":
+            return MaterialPageRoute(builder: (context) => ReconnectPage());
 
             
           
           case "/catch":
             final extraData = settings.arguments as CreaturesInTheWild;
             return MaterialPageRoute(
-              builder: (context) => CatchPage(com: com, creature: extraData),
+              builder: (context) => CatchPage(creature: extraData),
             );
 
           default:
-            return MaterialPageRoute(builder: (context) => SignupPage(com: com));
+            return MaterialPageRoute(builder: (context) => SignupPage());
         }
       },
         

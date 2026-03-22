@@ -2,8 +2,11 @@ import 'package:client/models/Message.dart';
 import 'dart:typed_data';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'login.dart';
 import '../../modules/jwt_storage.dart';
+import '../../widgets/appState.dart';
+
 
 
 
@@ -35,9 +38,9 @@ class LoginState extends State<LoginPage>{
     Uint8List bytesPsw = Uint8List.fromList(utf8.encode(password));
 
     Message msg = Message(0x0001, 0x0000, [bytesEmail, bytesPsw]);
-    widget.com.send(msg);
+    context.read<AppState>().com.send(msg);
 
-    Message? reply = await widget.com.recv();
+    Message? reply = await context.read<AppState>().com.recv();
 
 
     bool loginSuccess = false;
@@ -45,6 +48,10 @@ class LoginState extends State<LoginPage>{
     if (reply != null && reply.status == 0x0001 && reply.opcode == 0x0001 && reply.fields.isNotEmpty){
       loginSuccess = true;
       await JwtStorage().write(String.fromCharCodes(reply.fields[0]));
+    }
+
+    else if (reply == null && mounted){
+          Navigator.popAndPushNamed(context, '/reconnect');
     }
 
     setState(() => _isLoading = false);

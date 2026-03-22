@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'app/memego.dart';
+import 'widgets/appState.dart';
 
 import 'dart:io';
 import 'modules/keySwap.dart';
@@ -11,5 +13,8 @@ void main() async{
 
   final Communication com = await Keyswap.swap(s);
 
-  runApp(MemeGo(com: com));
+  runApp( ChangeNotifierProvider(
+      create: (_) => AppState(com),
+      child: MemeGo(),
+    ),);
 }

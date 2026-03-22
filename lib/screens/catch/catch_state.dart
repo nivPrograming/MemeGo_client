@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math.dart' hide Colors;
+import 'package:provider/provider.dart';
 import 'dart:async';
 
 import 'catch.dart';
@@ -7,6 +8,8 @@ import '../../modules/Communication.dart';
 import '../../models/Message.dart';
 import '../../models/data_base_types.dart';
 import '../../modules/json_helper.dart';
+import '../../widgets/appState.dart';
+
 
 
 class CatchPageState extends State<CatchPage> {
@@ -99,22 +102,27 @@ class CatchPageState extends State<CatchPage> {
     if ((_creatureX - 0.5).abs() < 0.05 && (_creatureX - 0.5).abs() < 0.05){
 
         Message msg = Message(0x0008, 0x0000, [widget.creature.toBytes()]);
-        widget.com.send(msg);
-        Message? reply =  await widget.com.recv();
+        context.read<AppState>().com.send(msg);
+        Message? reply =  await context.read<AppState>().com.recv();
 
         if (mounted && reply != null && reply.opcode == 0x0008 && reply.status == 0x0001){
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Caught successfully!'))
           );
 
-          Navigator.pop(context);
+          Navigator.popAndPushNamed(context, '/home');
         }
+
+        else if (reply == null && mounted){
+          Navigator.popAndPushNamed(context, '/reconnect');
+        }
+
         else if (mounted){
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('OPSSSS, No Catch for you today'))
           );
 
-          Navigator.pop(context);
+          Navigator.popAndPushNamed(context, '/home');
         }
 
       }

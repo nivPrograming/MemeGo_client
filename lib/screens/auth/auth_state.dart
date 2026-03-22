@@ -2,7 +2,11 @@ import 'package:client/models/Message.dart';
 import 'dart:typed_data';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'auth.dart';
+
+import '../../widgets/appState.dart';
+
 
 
 
@@ -31,9 +35,9 @@ class AuthState extends State<AuthPage>{
 
 
     Message msg = Message(0x0004, 0x0000, [bytesCode,]);
-    widget.com.send(msg);
+    context.read<AppState>().com.send(msg);
 
-    Message? reply = await widget.com.recv();
+    Message? reply = await context.read<AppState>().com.recv();
 
     bool authSuccess = false;
     bool authCodeExp = false;
@@ -44,6 +48,10 @@ class AuthState extends State<AuthPage>{
 
     else if (reply != null && reply.status == 0x0003 && reply.opcode == 0x0004){
       authCodeExp = true;
+    }
+
+    else if (reply == null && mounted){
+      Navigator.popAndPushNamed(context, '/reconnect');
     }
 
     setState(() => _isLoading = false);

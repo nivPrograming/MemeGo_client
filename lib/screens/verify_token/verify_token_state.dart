@@ -2,7 +2,10 @@
 import 'dart:typed_data';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'verify_token.dart';
+import '../../widgets/appState.dart';
 import '../../modules/Communication.dart';
 import '../../models/Message.dart';
 import '../../modules/jwt_storage.dart';
@@ -34,24 +37,23 @@ class VerifyTokenState extends State<VerifyToken> {
     Uint8List bytesJwt = Utf8Encoder().convert(jwtToken);
 
     Message msg = Message(0x000B, 0x0000, [bytesJwt]);
-    widget.com.send(msg);
+    context.read<AppState>().com.send(msg);
 
-    Message? reply =  await widget.com.recv();
+    Message? reply =  await context.read<AppState>().com.recv();
    
     if (reply != null && reply.opcode == 0x000B){
       if (reply.status == 0x0001 && mounted){
         Navigator.popAndPushNamed(context, '/home');
       }
-
-      else if (mounted){
-      Navigator.popAndPushNamed(context, '/login');
-      print("logiinnin");
-    }
     }
 
+    else if (reply == null && mounted){
+       Navigator.popAndPushNamed(context, '/reconnect');
+    }
 
-    
-    
+    else if (mounted){
+        Navigator.popAndPushNamed(context, '/login');
+    }
   }
 }
 

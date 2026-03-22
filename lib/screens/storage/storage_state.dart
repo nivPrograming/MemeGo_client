@@ -1,11 +1,14 @@
 import 'dart:typed_data';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'storage.dart';
 import '../../modules/Communication.dart';
 import '../../modules/json_helper.dart';
 import '../../models/Message.dart';
 import '../../models/data_base_types.dart';
+import '../../widgets/appState.dart';
 
 class StoragePageState extends State<StoragePage> {
 
@@ -43,18 +46,21 @@ class StoragePageState extends State<StoragePage> {
   }
 
   Future<void> getCreatures() async{
-      Message msg = Message(0x0006, 0x0000);
-      widget.com.send(msg);
+    Message msg = Message(0x0006, 0x0000);
+    context.read<AppState>().com.send(msg);
 
-      Message? reply = await widget.com.recv();
-      if (reply != null && reply.opcode == 0x0006 && reply.status == 0x0001){
-        for (int i = 0; i < reply.fields.length; i++){
-          _creatures.add(CreaturesCaught.fromBytes(reply.fields[i]));
-        }
+    Message? reply = await context.read<AppState>().com.recv();
+    if (reply != null && reply.opcode == 0x0006 && reply.status == 0x0001){
+      for (int i = 0; i < reply.fields.length; i++){
+        _creatures.add(CreaturesCaught.fromBytes(reply.fields[i]));
       }
 
       buildScroll();
+    }
 
+    else if (reply == null && mounted){
+       Navigator.popAndPushNamed(context, '/reconnect');
+    }
   }
 
   Future<void> buildScroll() async{
@@ -70,9 +76,9 @@ class StoragePageState extends State<StoragePage> {
       newImages.add(Row(
         children: 
           [
-            GestureDetector( child: Column(children: [Image.asset("Creatures/${creature1Type!["photo"]}", width: _width * 0.4, height: _height * 0.3), Text(creature1Type["name"])])),
+            Column(children: [Image.asset("Creatures/${creature1Type!["photo"]}", width: _width * 0.4, height: _height * 0.3), Text(creature1Type["name"]), Text("${_creatures[i].resiliencePoints}")]),
             creature2Type != null
-            ? GestureDetector( child: Column(children: [Image.asset("Creatures/${creature2Type["photo"]}", width: _width * 0.4, height: _height * 0.3), Text(creature2Type["name"])]))
+            ?  Column(children: [Image.asset("Creatures/${creature2Type["photo"]}", width: _width * 0.4, height: _height * 0.3), Text(creature2Type["name"]), Text("${_creatures[i + 1].resiliencePoints}")])
             : SizedBox(width: _width * 0.4, height: _height * 0.3)
           ],
         )
