@@ -9,7 +9,7 @@ import 'modules/Communication.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
-  final s = await Socket.connect("10.0.2.2", 4133);
+  final s = await Socket.connect("84.229.2.17", 4133);
 
   final Communication com = await Keyswap.swap(s);
 

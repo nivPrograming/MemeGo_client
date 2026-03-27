@@ -113,7 +113,7 @@ class Communication {
   static Future<Communication?> restoreCon({int maxRetries = 5}) async {
     for (int i = 0; i < maxRetries; i++) {
       try {
-        final s = await Socket.connect("10.0.2.2", 4133)
+        final s = await Socket.connect("84.229.2.17", 4133)
             .timeout(Duration(seconds: 5));
         final Communication c = await Keyswap.swap(s)
             .timeout(Duration(seconds: 5));

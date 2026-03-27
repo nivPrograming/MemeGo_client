@@ -78,6 +78,7 @@ class Creature {
 }
 
 class CreaturesInTheWild {
+  final int id;
   final int type;
   final int resiliencePoints;
   final String geohash;
@@ -85,6 +86,7 @@ class CreaturesInTheWild {
   final double lon;
 
   CreaturesInTheWild({
+    required this.id,
     required this.type,
     required this.resiliencePoints,
     required this.geohash,
@@ -94,6 +96,7 @@ class CreaturesInTheWild {
 
   Uint8List toBytes() {
     final data = {
+      'id': id,
       'type': type,
       'resilience_points': resiliencePoints,
       'geohash': geohash,
@@ -106,6 +109,7 @@ class CreaturesInTheWild {
   static CreaturesInTheWild fromBytes(Uint8List bytes) {
     final json = jsonDecode(utf8.decode(bytes));
     return CreaturesInTheWild(
+      id: json['id'],
       type: json['type'],
       resiliencePoints: json['resilience_points'],
       geohash: json['geohash'],

@@ -35,7 +35,7 @@ class StoragePageState extends State<StoragePage> {
     _height = _size.height - _padding.bottom - _padding.top;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
+      appBar: AppBar(title: const Text('Creature Inventory')),
       body: SingleChildScrollView(
         scrollDirection: Axis.vertical,
         child: Column(

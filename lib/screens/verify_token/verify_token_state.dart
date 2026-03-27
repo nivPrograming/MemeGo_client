@@ -37,23 +37,24 @@ class VerifyTokenState extends State<VerifyToken> {
     Uint8List bytesJwt = Utf8Encoder().convert(jwtToken);
 
     Message msg = Message(0x000B, 0x0000, [bytesJwt]);
-    context.read<AppState>().com.send(msg);
+    if (mounted){
+      context.read<AppState>().com.send(msg);
 
-    Message? reply =  await context.read<AppState>().com.recv();
-   
-    if (reply != null && reply.opcode == 0x000B){
-      if (reply.status == 0x0001 && mounted){
-        Navigator.popAndPushNamed(context, '/home');
+      Message? reply =  await context.read<AppState>().com.recv();
+    
+      if (reply != null && reply.opcode == 0x000B && reply.status == 0x0001 && mounted){
+          Navigator.popAndPushNamed(context, '/home');
+      }
+
+      else if (reply == null && mounted){
+        Navigator.popAndPushNamed(context, '/reconnect');
+      }
+
+      else if (mounted){
+          Navigator.popAndPushNamed(context, '/login');
       }
     }
 
-    else if (reply == null && mounted){
-       Navigator.popAndPushNamed(context, '/reconnect');
-    }
-
-    else if (mounted){
-        Navigator.popAndPushNamed(context, '/login');
-    }
   }
 }
 
