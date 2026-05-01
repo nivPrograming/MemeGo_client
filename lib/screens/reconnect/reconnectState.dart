@@ -24,6 +24,10 @@ class ReconnectState extends State<ReconnectPage>{
         context.read<AppState>().replaceCom(newCom);
         Navigator.popAndPushNamed(context, '/verify_token');
       }
+
+      else if(mounted){
+        Navigator.pop(context);
+      }
   }
 
   @override
@@ -34,9 +38,19 @@ class ReconnectState extends State<ReconnectPage>{
 
   @override
   Widget build(BuildContext context) {
+    Size size = MediaQuery.of(context).size;
+    EdgeInsets padding = MediaQuery.of(context).padding;
+    final double width = size.width;
+    final double height = size.height - padding.bottom - padding.top;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Email Authentication')),
-      body:Icon(Icons.signal_wifi_connected_no_internet_4_outlined)
+      appBar: AppBar(title: const Text('RECONNECTING')),
+      body:SizedBox(
+        width: width,
+        height: height,
+        child: Icon(Icons.signal_wifi_connected_no_internet_4_outlined),
+        
+        )
     );
   }
 

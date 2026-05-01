@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:async';
+import "package:flutter/services.dart";
 import '../models/Message.dart';
 import 'AES.dart';
 import '../modules/keySwap.dart';
@@ -56,8 +57,7 @@ class Communication {
     return Message.loadFromBytes(decrypted);
   }
 
-  /// ---- framing ----
-
+  
   void sendWithSize(Uint8List data) {
     final header = ByteData(4)..setUint32(0, data.length, Endian.big);
     socket.add(header.buffer.asUint8List());
@@ -104,16 +104,22 @@ class Communication {
   _waiters.clear();
 }
   
-  // Added: cleanup method
+
   Future<void> close() async {
     await _subscription.cancel();
     await socket.close();
   }
 
   static Future<Communication?> restoreCon({int maxRetries = 5}) async {
+
+    String? ip = await _readIP("assets/IP.txt");
+
+    ip ??= "84.229.2.17";
+    
+
     for (int i = 0; i < maxRetries; i++) {
       try {
-        final s = await Socket.connect("84.229.2.17", 4133)
+        final s = await Socket.connect(ip, 4133)
             .timeout(Duration(seconds: 5));
         final Communication c = await Keyswap.swap(s)
             .timeout(Duration(seconds: 5));
@@ -122,6 +128,19 @@ class Communication {
         await Future.delayed(Duration(seconds: 2));
       }
     }
-    return null; // give up after maxRetries
+    return null; 
+  }
+
+
+  static Future<String?> _readIP(String filePath) async{
+    try {
+      
+      final contents = await rootBundle.loadString(filePath);
+      return contents;
+    }
+    catch (e) {
+      print('Error reading file: $e');
+    }
+    return null;
   }
 }

@@ -9,12 +9,12 @@ import 'modules/Communication.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
-  final s = await Socket.connect("84.229.2.17", 4133);
+  final Communication? com = await Communication.restoreCon();
 
-  final Communication com = await Keyswap.swap(s);
-
-  runApp( ChangeNotifierProvider(
-      create: (_) => AppState(com),
-      child: MemeGo(),
-    ),);
+  if (com != null){
+    runApp( ChangeNotifierProvider(
+        create: (_) => AppState(com),
+        child: MemeGo(),
+      ),);
+  }
 }

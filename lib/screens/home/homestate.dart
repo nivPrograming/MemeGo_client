@@ -114,7 +114,7 @@ class HomeState extends State<HomePage>{
         appBar: AppBar(backgroundColor: Colors.white, title: Text("meme mapping"),),
         body: FlutterMap(options: MapOptions(
             initialCenter: LatLng(_lat, _lon),
-            initialZoom: 18,
+            initialZoom: 16.5,
             interactionOptions: InteractionOptions(flags: InteractiveFlag.none),
             onMapReady: () => setState(() {
               _isMapReady = true;
