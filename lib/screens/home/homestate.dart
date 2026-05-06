@@ -68,14 +68,16 @@ class HomeState extends State<HomePage>{
         }
       }
      
-      setState(() {
-        markers = newCretures;
-      });
+     
     }
 
     else if (retData == null && mounted){
       Navigator.popAndPushNamed(context, '/reconnect');
     }
+
+    setState(() {
+      markers = newCretures;
+    });
   }
 
 
@@ -132,7 +134,6 @@ class HomeState extends State<HomePage>{
           ],
         ),
         bottomNavigationBar: BottomNavigationBar(items: [
-            BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Settings"),
             BottomNavigationBarItem(icon: Icon(Icons.archive_sharp), label: "Storage"),
             BottomNavigationBarItem(icon: Icon(Icons.exit_to_app_sharp), label: "log out")
           ],

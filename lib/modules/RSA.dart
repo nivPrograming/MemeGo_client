@@ -4,7 +4,7 @@ import 'package:pointycastle/export.dart';
 import 'package:asn1lib/asn1lib.dart';
 
 class RSAHelper {
-  /// Generate RSA key pair (2048 bits, exponent 65537)
+  /// Generate RSA key pair (2048 bits)
   static Map<String, Uint8List> generateRSAKeys() {
     final keyGen = RSAKeyGenerator()
       ..init(
@@ -133,15 +133,12 @@ class RSAHelper {
     final asn1Parser = ASN1Parser(bytes);
     final topLevelSeq = asn1Parser.nextObject() as ASN1Sequence;
     
-    // Handle PKCS#8 format (has extra wrapping)
     ASN1Sequence privateKeySeq;
     if (topLevelSeq.elements.length == 3) {
-      // PKCS#8 format
       final privateKeyOctet = topLevelSeq.elements[2] as ASN1OctetString;
       final innerParser = ASN1Parser(privateKeyOctet.octets);
       privateKeySeq = innerParser.nextObject() as ASN1Sequence;
     } else {
-      // PKCS#1 format
       privateKeySeq = topLevelSeq;
     }
     

@@ -8,6 +8,7 @@ import 'modules/keySwap.dart';
 import 'modules/Communication.dart';
 
 void main() async{
+  //initialises the connection and runs the fluute app
   WidgetsFlutterBinding.ensureInitialized();
   final Communication? com = await Communication.restoreCon();
 

@@ -1,5 +1,6 @@
 import "package:flutter_secure_storage/flutter_secure_storage.dart";
 
+// singleton class for handling the storage of the user's jwt used to connect to the server
 class JwtStorage {
   static const JwtStorage _instance = JwtStorage._privCon();
   final FlutterSecureStorage _storage = const FlutterSecureStorage();

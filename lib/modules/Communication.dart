@@ -19,6 +19,8 @@ class Communication {
 
   bool _isClosed = false;
 
+
+  // Constructor, setups the socket listener
   Communication(this.socket, this.key) {
     _subscription = socket.listen(
   (chunk) {
@@ -42,7 +44,7 @@ class Communication {
     final plain = msg.prepare();
     final encrypted = AES.aesGcmEncrypt(plain, key);
     sendWithSize(encrypted);
-    socket.flush(); // async flush, don't await
+    socket.flush(); 
   } catch (e) {
     _isClosed = true;
     _notifyWaiters();
@@ -57,13 +59,14 @@ class Communication {
     return Message.loadFromBytes(decrypted);
   }
 
-  
+  //Sends data prefixed with a 4-byte big-endian size header
   void sendWithSize(Uint8List data) {
     final header = ByteData(4)..setUint32(0, data.length, Endian.big);
     socket.add(header.buffer.asUint8List());
     socket.add(data);
   }
 
+  // Reads the size header then reads exactly that many bytes
   Future<Uint8List> recvBySize() async {
     final header = await _readExact(4);
     if (header.isEmpty) return Uint8List(0);
@@ -74,6 +77,7 @@ class Communication {
     return body.length == len ? body : Uint8List(0);
   }
 
+    // Waits until exactly n bytes are in the buffer, times out after 5 seconds
   Future<Uint8List> _readExact(int n) async {
     Timer? timer;
   
@@ -97,6 +101,7 @@ class Communication {
     return result;
   }
 
+  // Wakes up all pending recv calls waiting for data
   void _notifyWaiters() {
     for (final w in _waiters) {
       if (!w.isCompleted) w.complete();
@@ -104,12 +109,13 @@ class Communication {
   _waiters.clear();
 }
   
-
+  // Cancels the socket subscription and closes the connection
   Future<void> close() async {
     await _subscription.cancel();
     await socket.close();
   }
 
+   // Attempts to reconnect to the server.
   static Future<Communication?> restoreCon({int maxRetries = 5}) async {
 
     String? ip = await _readIP("assets/IP.txt");
@@ -131,7 +137,7 @@ class Communication {
     return null; 
   }
 
-
+  // reads the  IP from the assets IP.txt file
   static Future<String?> _readIP(String filePath) async{
     try {
       
